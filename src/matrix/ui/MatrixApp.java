@@ -95,8 +95,7 @@ public class MatrixApp extends JFrame {
     // ─── Look-and-feel ────────────────────────────────────────────────────────
 
     private void applyGlobalLAF() {
-        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-        catch (Exception ignored) {}
+        // Keep the Look and Feel set by Main.java (Nimbus)
         UIManager.put("Panel.background", C_BG);
         UIManager.put("ScrollPane.background", C_PANEL);
         UIManager.put("Table.background", C_CARD);
@@ -248,10 +247,8 @@ public class MatrixApp extends JFrame {
         sizeSpinner = new JSpinner(model);
         sizeSpinner.setPreferredSize(new Dimension(60, 30));
         styleSpinner(sizeSpinner);
-
-        JButton btnApply = makeGlassButton("Apply", C_ACCENT1);
-        btnApply.setName("btn-apply-size");
-        btnApply.addActionListener(e -> applySize());
+        
+        sizeSpinner.addChangeListener(e -> applySize());
 
         JButton btnClear = makeGlassButton("Clear All", C_ERR);
         btnClear.setName("btn-clear");
@@ -259,7 +256,6 @@ public class MatrixApp extends JFrame {
 
         p.add(lbl);
         p.add(sizeSpinner);
-        p.add(btnApply);
         p.add(Box.createHorizontalStrut(6));
         p.add(btnClear);
         return p;
@@ -286,7 +282,11 @@ public class MatrixApp extends JFrame {
         if (isA) { cellsA = cells; gridPanelA = grid; }
         else      { cellsB = cells; gridPanelB = grid; }
 
-        card.add(grid, BorderLayout.CENTER);
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setBackground(C_CARD);
+        wrapper.add(grid);
+
+        card.add(wrapper, BorderLayout.CENTER);
         return card;
     }
 
@@ -842,12 +842,12 @@ public class MatrixApp extends JFrame {
     }
 
     private void styleSpinner(JSpinner spinner) {
-        spinner.setBackground(C_CELL_BG);
-        spinner.setForeground(C_TEXT);
+        spinner.setBackground(Color.WHITE);
+        spinner.setForeground(Color.BLACK);
         JComponent editor = spinner.getEditor();
         if (editor instanceof JSpinner.DefaultEditor de) {
-            de.getTextField().setBackground(C_CELL_BG);
-            de.getTextField().setForeground(C_TEXT);
+            de.getTextField().setBackground(Color.WHITE);
+            de.getTextField().setForeground(Color.BLACK);
             de.getTextField().setCaretColor(C_ACCENT2);
             de.getTextField().setFont(FONT_BODY);
         }

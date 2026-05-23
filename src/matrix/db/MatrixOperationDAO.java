@@ -35,8 +35,7 @@ public class MatrixOperationDAO {
                 (operation_type, matrix_a, matrix_b, result_matrix, scalar_result, rows_a, cols_a)
             VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = DatabaseManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, type);
             ps.setString(2, matrixA.toCompactString());
@@ -70,8 +69,7 @@ public class MatrixOperationDAO {
         String sql = "SELECT * FROM matrix_operations ORDER BY created_at DESC"
                      + (limit > 0 ? " LIMIT " + limit : "");
         List<OperationRecord> records = new ArrayList<>();
-        try (Connection conn = DatabaseManager.getConnection();
-             Statement st = conn.createStatement();
+        try (Statement st = DatabaseManager.getConnection().createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -97,8 +95,7 @@ public class MatrixOperationDAO {
      * Returns the total number of saved operations.
      */
     public static int countAll() {
-        try (Connection conn = DatabaseManager.getConnection();
-             Statement st = conn.createStatement();
+        try (Statement st = DatabaseManager.getConnection().createStatement();
              ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM matrix_operations")) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {

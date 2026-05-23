@@ -147,11 +147,20 @@ public class HistoryDialog extends JDialog {
 
         // Header style
         JTableHeader th = table.getTableHeader();
-        th.setBackground(C_ACCENT1);
-        th.setForeground(Color.WHITE);
-        th.setFont(FONT_LABEL);
         th.setPreferredSize(new Dimension(0, 32));
         th.setReorderingAllowed(false);
+        th.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override public Component getTableCellRendererComponent(
+                    JTable t, Object val, boolean sel, boolean focus, int row, int col) {
+                super.getTableCellRendererComponent(t, val, sel, focus, row, col);
+                setBackground(new Color(0x1D4ED8)); // Blue background
+                setForeground(Color.WHITE);         // White text
+                setFont(FONT_LABEL);
+                setHorizontalAlignment(JLabel.CENTER);
+                setBorder(new MatteBorder(0, 0, 1, 1, C_BORDER));
+                return this;
+            }
+        });
 
         // Row striping renderer
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {

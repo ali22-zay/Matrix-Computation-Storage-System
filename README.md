@@ -59,51 +59,38 @@ Matrix Computation & Storage System/
 
 ## 🚀 Setup & Run
 
-### 1. Download the MySQL JDBC Driver
+Follow these instructions to quickly run the project on your local machine.
 
-Download **mysql-connector-j-8.x.x.jar** from:
-- https://dev.mysql.com/downloads/connector/j/
+### 1. How to Setup MySQL Database & Import `database.sql`
 
-Place the `.jar` file in the `lib/` folder of this project.
+1. Open your **MySQL Command Line** or **MySQL Workbench**.
+2. Run the following command to import the database schema and sample data:
+   ```sql
+   source database.sql
+   ```
+   *This automatically creates the `matrix_db` database and the `matrix_operations` table.*
 
-### 2. Set Up the Database
+### 2. How to Configure DB Username/Password
 
-Open MySQL CLI or Workbench and run:
+Before running the project, you must provide your local MySQL credentials.
 
-```sql
-source sql/setup.sql
-```
-
-This creates the `matrix_db` database, the `matrix_operations` table, and inserts 5 sample rows.
-
-### 3. Configure Database Credentials
-
-If your MySQL username/password differs from the defaults (`root` / no password), edit:
-
-📄 **`src/matrix/db/DatabaseManager.java`**
-
+Open `src/matrix/db/DatabaseManager.java` and update lines 20-21:
 ```java
-private static final String DB_USER     = "root";       // ← your username
-private static final String DB_PASSWORD = "";            // ← your password
+private static final String DB_USER     = "root";                // ← your MySQL username
+private static final String DB_PASSWORD = "your_password_here";  // ← your MySQL password
 ```
 
-### 4. Compile
+### 3. How to Run the Project Locally
 
-```batch
-compile.bat
-```
+The required MySQL JDBC driver (`mysql-connector-j-8.4.0.jar`) is already included in the `lib/` folder.
 
-### 5. Run
+1. Open your terminal (Command Prompt or PowerShell) inside the project folder.
+2. Run the provided build script to compile and launch the application:
+   ```batch
+   .\compile_and_run.bat
+   ```
 
-```batch
-run.bat
-```
-
-Or use the one-click script:
-
-```batch
-compile_and_run.bat
-```
+*(Alternatively, you can compile and run separately by executing `.\compile.bat` followed by `.\run.bat`)*
 
 ---
 

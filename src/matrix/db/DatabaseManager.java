@@ -18,7 +18,7 @@ public class DatabaseManager {
     private static final String DB_PORT     = "3306";
     private static final String DB_NAME     = "matrix_db";
     private static final String DB_USER     = "root";
-    private static final String DB_PASSWORD = "";          // ← your MySQL password
+    private static final String DB_PASSWORD = "your_password_here";          // ← your MySQL password
 
     private static final String JDBC_URL =
         "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME
