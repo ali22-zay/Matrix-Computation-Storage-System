@@ -32,8 +32,8 @@ public class MatrixOperationDAO {
                             Double scalarResult) {
         final String sql = """
             INSERT INTO matrix_operations
-                (operation_type, matrix_a, matrix_b, result_matrix, scalar_result, rows_a, cols_a)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                (operation_type, matrix_a, matrix_b, result_matrix, scalar_result, rows_a, cols_a, rows_b, cols_b)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
         try (PreparedStatement ps = DatabaseManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -45,6 +45,13 @@ public class MatrixOperationDAO {
             else ps.setNull(5, Types.DOUBLE);
             ps.setInt(6, matrixA.getRows());
             ps.setInt(7, matrixA.getCols());
+            if (matrixB != null) {
+                ps.setInt(8, matrixB.getRows());
+                ps.setInt(9, matrixB.getCols());
+            } else {
+                ps.setNull(8, Types.INTEGER);
+                ps.setNull(9, Types.INTEGER);
+            }
 
             int affected = ps.executeUpdate();
             if (affected > 0) {
@@ -82,6 +89,8 @@ public class MatrixOperationDAO {
                     rs.getObject("scalar_result") != null ? rs.getDouble("scalar_result") : null,
                     rs.getInt("rows_a"),
                     rs.getInt("cols_a"),
+                    rs.getInt("rows_b"),
+                    rs.getInt("cols_b"),
                     rs.getTimestamp("created_at")
                 ));
             }
@@ -118,6 +127,8 @@ public class MatrixOperationDAO {
         Double   scalarResult,
         int      rowsA,
         int      colsA,
+        int      rowsB,
+        int      colsB,
         Timestamp createdAt
     ) {
         /** Formats the result for table display. */

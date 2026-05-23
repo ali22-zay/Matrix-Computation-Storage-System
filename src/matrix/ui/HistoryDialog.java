@@ -138,7 +138,7 @@ public class HistoryDialog extends JDialog {
         table.setSelectionForeground(Color.WHITE);
 
         // Column widths
-        int[] widths = {50, 110, 60, 200, 200, 200, 160};
+        int[] widths = {50, 110, 100, 180, 180, 180, 160};
         for (int i = 0; i < widths.length; i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
             if (i == 0 || i == 1 || i == 2)
@@ -225,7 +225,7 @@ public class HistoryDialog extends JDialog {
                         tableModel.addRow(new Object[]{
                             r.id(),
                             r.operationType(),
-                            r.rowsA() + "×" + r.colsA(),
+                            (r.matrixB() != null && !r.matrixB().isBlank() ? "A:" + r.rowsA() + "×" + r.colsA() + " B:" + r.rowsB() + "×" + r.colsB() : r.rowsA() + "×" + r.colsA()),
                             r.displayMatrixA(),
                             r.displayMatrixB(),
                             r.displayResult(),

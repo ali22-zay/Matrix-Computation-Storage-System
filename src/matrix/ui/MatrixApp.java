@@ -54,7 +54,8 @@ public class MatrixApp extends JFrame {
     private static final Font FONT_SMALL  = new Font("Segoe UI", Font.PLAIN, 11);
 
     // ─── State ────────────────────────────────────────────────────────────────
-    private int currentSize = DEF_SIZE;
+    private int rowsA = DEF_SIZE, colsA = DEF_SIZE;
+    private int rowsB = DEF_SIZE, colsB = DEF_SIZE;
     private boolean dbConnected = false;
 
     // ─── Widgets ──────────────────────────────────────────────────────────────
@@ -71,7 +72,7 @@ public class MatrixApp extends JFrame {
     private JLabel         lblPlaceholder;
     private JPanel         gridPanelA;
     private JPanel         gridPanelB;
-    private JSpinner       sizeSpinner;
+    private JSpinner       spinRowsA, spinColsA, spinRowsB, spinColsB;
 
     // ─── Constructor ─────────────────────────────────────────────────────────
 
@@ -239,23 +240,36 @@ public class MatrixApp extends JFrame {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         p.setBackground(C_BG);
 
-        JLabel lbl = new JLabel("Matrix Size:");
-        lbl.setFont(FONT_LABEL);
-        lbl.setForeground(C_TEXT);
+        JLabel lblA = new JLabel("Matrix A:");
+        lblA.setFont(FONT_LABEL);
+        lblA.setForeground(C_ACCENT2);
 
-        SpinnerNumberModel model = new SpinnerNumberModel(DEF_SIZE, 1, MAX_SIZE, 1);
-        sizeSpinner = new JSpinner(model);
-        sizeSpinner.setPreferredSize(new Dimension(60, 30));
-        styleSpinner(sizeSpinner);
+        spinRowsA = new JSpinner(new SpinnerNumberModel(DEF_SIZE, 1, MAX_SIZE, 1));
+        spinColsA = new JSpinner(new SpinnerNumberModel(DEF_SIZE, 1, MAX_SIZE, 1));
+        spinRowsA.setPreferredSize(new Dimension(50, 30));
+        spinColsA.setPreferredSize(new Dimension(50, 30));
         
-        sizeSpinner.addChangeListener(e -> applySize());
+        JLabel lblB = new JLabel("  Matrix B:");
+        lblB.setFont(FONT_LABEL);
+        lblB.setForeground(C_ACCENT3);
+
+        spinRowsB = new JSpinner(new SpinnerNumberModel(DEF_SIZE, 1, MAX_SIZE, 1));
+        spinColsB = new JSpinner(new SpinnerNumberModel(DEF_SIZE, 1, MAX_SIZE, 1));
+        spinRowsB.setPreferredSize(new Dimension(50, 30));
+        spinColsB.setPreferredSize(new Dimension(50, 30));
+
+        Runnable onChange = () -> applySize();
+        spinRowsA.addChangeListener(e -> onChange.run());
+        spinColsA.addChangeListener(e -> onChange.run());
+        spinRowsB.addChangeListener(e -> onChange.run());
+        spinColsB.addChangeListener(e -> onChange.run());
 
         JButton btnClear = makeGlassButton("Clear All", C_ERR);
         btnClear.setName("btn-clear");
         btnClear.addActionListener(e -> clearAll());
 
-        p.add(lbl);
-        p.add(sizeSpinner);
+        p.add(lblA); p.add(spinRowsA); p.add(new JLabel("x")); p.add(spinColsA);
+        p.add(lblB); p.add(spinRowsB); p.add(new JLabel("x")); p.add(spinColsB);
         p.add(Box.createHorizontalStrut(6));
         p.add(btnClear);
         return p;
@@ -274,10 +288,10 @@ public class MatrixApp extends JFrame {
         lbl.setForeground(isA ? C_ACCENT2 : C_ACCENT3);
         card.add(lbl, BorderLayout.NORTH);
 
-        JPanel grid = new JPanel(new GridLayout(currentSize, currentSize, 6, 6));
+        JPanel grid = new JPanel(new GridLayout(DEF_SIZE, DEF_SIZE, 6, 6));
         grid.setBackground(C_CARD);
         JTextField[][] cells = new JTextField[MAX_SIZE][MAX_SIZE];
-        populateGrid(grid, cells, currentSize, isA);
+        populateGrid(grid, cells, DEF_SIZE, DEF_SIZE, isA);
 
         if (isA) { cellsA = cells; gridPanelA = grid; }
         else      { cellsB = cells; gridPanelB = grid; }
@@ -290,11 +304,11 @@ public class MatrixApp extends JFrame {
         return card;
     }
 
-    private void populateGrid(JPanel grid, JTextField[][] cells, int size, boolean isA) {
+    private void populateGrid(JPanel grid, JTextField[][] cells, int rows, int cols, boolean isA) {
         grid.removeAll();
-        grid.setLayout(new GridLayout(size, size, 6, 6));
-        for (int i = 0; i < size; i++)
-            for (int j = 0; j < size; j++) {
+        grid.setLayout(new GridLayout(rows, cols, 6, 6));
+        for (int i = 0; i < rows; i++)
+            for (int j = 0; j < cols; j++) {
                 if (cells[i][j] == null) cells[i][j] = makeMatrixCell();
                 else cells[i][j].setText("");
                 cells[i][j].putClientProperty("row", i);
@@ -466,14 +480,14 @@ public class MatrixApp extends JFrame {
 
     private void performOperation(String op) {
         try {
-            Matrix a = readMatrix(cellsA);
+            Matrix a = readMatrix(cellsA, rowsA, colsA);
             Matrix result = null;
             Double scalar = null;
 
             switch (op) {
-                case "ADD"         -> { Matrix b = readMatrix(cellsB); result = a.add(b);       saveOp(op, a, b, result, null); }
-                case "SUBTRACT"    -> { Matrix b = readMatrix(cellsB); result = a.subtract(b);  saveOp(op, a, b, result, null); }
-                case "MULTIPLY"    -> { Matrix b = readMatrix(cellsB); result = a.multiply(b);  saveOp(op, a, b, result, null); }
+                case "ADD"         -> { Matrix b = readMatrix(cellsB, rowsB, colsB); result = a.add(b);       saveOp(op, a, b, result, null); }
+                case "SUBTRACT"    -> { Matrix b = readMatrix(cellsB, rowsB, colsB); result = a.subtract(b);  saveOp(op, a, b, result, null); }
+                case "MULTIPLY"    -> { Matrix b = readMatrix(cellsB, rowsB, colsB); result = a.multiply(b);  saveOp(op, a, b, result, null); }
                 case "TRANSPOSE"   -> { result = a.transpose();                                  saveOp(op, a, null, result, null); }
                 case "DETERMINANT" -> {
                     SquareMatrix sq = SquareMatrix.from(a);
@@ -575,11 +589,14 @@ public class MatrixApp extends JFrame {
     // ─── Grid management ─────────────────────────────────────────────────────
 
     private void applySize() {
-        currentSize = (int) sizeSpinner.getValue();
-        populateGrid(gridPanelA, cellsA, currentSize, true);
-        populateGrid(gridPanelB, cellsB, currentSize, false);
+        rowsA = (int) spinRowsA.getValue();
+        colsA = (int) spinColsA.getValue();
+        rowsB = (int) spinRowsB.getValue();
+        colsB = (int) spinColsB.getValue();
+        populateGrid(gridPanelA, cellsA, rowsA, colsA, true);
+        populateGrid(gridPanelB, cellsB, rowsB, colsB, false);
         displayResult(null, null, null);
-        setStatus("Grid resized to " + currentSize + "×" + currentSize);
+        setStatus("Grid A: " + rowsA + "x" + colsA + " | Grid B: " + rowsB + "x" + colsB);
     }
 
     private void clearAll() {
@@ -604,10 +621,10 @@ public class MatrixApp extends JFrame {
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
-    private Matrix readMatrix(JTextField[][] cells) {
-        double[][] data = new double[currentSize][currentSize];
-        for (int i = 0; i < currentSize; i++)
-            for (int j = 0; j < currentSize; j++) {
+    private Matrix readMatrix(JTextField[][] cells, int rows, int cols) {
+        double[][] data = new double[rows][cols];
+        for (int i = 0; i < rows; i++)
+            for (int j = 0; j < cols; j++) {
                 String txt = cells[i][j].getText().trim();
                 if (txt.isEmpty()) txt = "0";
                 try {
@@ -660,15 +677,17 @@ public class MatrixApp extends JFrame {
             JTextField[][] otherGrid = isA ? cellsB : cellsA;
 
             int code = e.getKeyCode();
-            
+            int gRows = isA ? rowsA : rowsB;
+            int gCols = isA ? colsA : colsB;
+
             if (code == java.awt.event.KeyEvent.VK_ENTER) {
                 int nextCol = c + 1;
                 int nextRow = r;
-                if (nextCol >= currentSize) {
+                if (nextCol >= gCols) {
                     nextCol = 0;
                     nextRow = r + 1;
                 }
-                if (nextRow < currentSize) {
+                if (nextRow < gRows) {
                     currentGrid[nextRow][nextCol].requestFocusInWindow();
                     currentGrid[nextRow][nextCol].selectAll();
                 } else {
@@ -678,7 +697,7 @@ public class MatrixApp extends JFrame {
                 e.consume();
             } 
             else if (code == java.awt.event.KeyEvent.VK_RIGHT) {
-                if (c + 1 < currentSize) {
+                if (c + 1 < gCols) {
                     currentGrid[r][c + 1].requestFocusInWindow();
                     currentGrid[r][c + 1].selectAll();
                     e.consume();
@@ -699,7 +718,7 @@ public class MatrixApp extends JFrame {
                 }
             } 
             else if (code == java.awt.event.KeyEvent.VK_DOWN) {
-                if (r + 1 < currentSize) {
+                if (r + 1 < gRows) {
                     currentGrid[r + 1][c].requestFocusInWindow();
                     currentGrid[r + 1][c].selectAll();
                     e.consume();

@@ -24,6 +24,8 @@ CREATE TABLE matrix_operations (
     scalar_result  DOUBLE                   COMMENT 'Populated only for DETERMINANT',
     rows_a         INT             NOT NULL COMMENT 'Row count of Matrix A',
     cols_a         INT             NOT NULL COMMENT 'Column count of Matrix A',
+    rows_b         INT                      COMMENT 'Row count of Matrix B',
+    cols_b         INT                      COMMENT 'Column count of Matrix B',
     created_at     DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
@@ -35,37 +37,37 @@ CREATE TABLE matrix_operations (
 
 -- 4. Seed a few sample rows for testing the History view
 INSERT INTO matrix_operations
-    (operation_type, matrix_a, matrix_b, result_matrix, scalar_result, rows_a, cols_a)
+    (operation_type, matrix_a, matrix_b, result_matrix, scalar_result, rows_a, cols_a, rows_b, cols_b)
 VALUES
     ('ADD',
      '[[1,2],[3,4]]',
      '[[5,6],[7,8]]',
      '[[6,8],[10,12]]',
-     NULL, 2, 2),
+     NULL, 2, 2, 2, 2),
 
     ('MULTIPLY',
      '[[1,2],[3,4]]',
      '[[2,0],[1,2]]',
      '[[4,4],[10,8]]',
-     NULL, 2, 2),
+     NULL, 2, 2, 2, 2),
 
     ('TRANSPOSE',
      '[[1,2,3],[4,5,6]]',
      NULL,
      '[[1,4],[2,5],[3,6]]',
-     NULL, 2, 3),
+     NULL, 2, 3, NULL, NULL),
 
     ('DETERMINANT',
      '[[3,8],[4,6]]',
      NULL,
      'N/A',
-     -14.0, 2, 2),
+     -14.0, 2, 2, NULL, NULL),
 
     ('SUBTRACT',
      '[[9,8],[7,6]]',
      '[[1,2],[3,4]]',
      '[[8,6],[4,2]]',
-     NULL, 2, 2);
+     NULL, 2, 2, 2, 2);
 
 -- 5. Verify
 SELECT id, operation_type, rows_a, cols_a, created_at
